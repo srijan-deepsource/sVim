@@ -340,14 +340,10 @@ if ([1,2].splice(0).length != 2) {
     }()) {//IE 6/7
         var array_splice = Array.prototype.splice;
         Array.prototype.splice = function(start, deleteCount) {
-            if (!arguments.length) {
-                return [];
-            } else {
-                return array_splice.apply(this, [
+            return !arguments.length ? [] : array_splice.apply(this, [
                     start === void 0 ? 0 : start,
                     deleteCount === void 0 ? (this.length - start) : deleteCount
-                ].concat(slice.call(arguments, 2)))
-            }
+                ].concat(slice.call(arguments, 2)));
         };
     } else {//IE8
         Array.prototype.splice = function(pos, removeCount){

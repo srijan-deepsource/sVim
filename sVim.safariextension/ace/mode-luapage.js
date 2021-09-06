@@ -2593,10 +2593,7 @@ oop.inherits(FoldMode, BaseFoldMode);
         }
 
         var row = stream.getCurrentTokenRow();
-        if (dir === -1)
-            return new Range(row, session.getLine(row).length, startRow, startColumn);
-        else
-            return new Range(startRow, startColumn, row, stream.getCurrentTokenColumn());
+        return dir === -1 ? new Range(row, session.getLine(row).length, startRow, startColumn) : new Range(startRow, startColumn, row, stream.getCurrentTokenColumn());
     };
 
 }).call(FoldMode.prototype);

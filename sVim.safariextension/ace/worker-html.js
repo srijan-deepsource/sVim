@@ -618,31 +618,19 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
     };
     this.inside = function(row, column) {
         if (this.compare(row, column) == 0) {
-            if (this.isEnd(row, column) || this.isStart(row, column)) {
-                return false;
-            } else {
-                return true;
-            }
+            return this.isEnd(row, column) || this.isStart(row, column) ? false : true;
         }
         return false;
     };
     this.insideStart = function(row, column) {
         if (this.compare(row, column) == 0) {
-            if (this.isEnd(row, column)) {
-                return false;
-            } else {
-                return true;
-            }
+            return this.isEnd(row, column) ? false : true;
         }
         return false;
     };
     this.insideEnd = function(row, column) {
         if (this.compare(row, column) == 0) {
-            if (this.isStart(row, column)) {
-                return false;
-            } else {
-                return true;
-            }
+            return this.isStart(row, column) ? false : true;
         }
         return false;
     };
@@ -668,18 +656,10 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         return 0;
     };
     this.compareStart = function(row, column) {
-        if (this.start.row == row && this.start.column == column) {
-            return -1;
-        } else {
-            return this.compare(row, column);
-        }
+        return this.start.row == row && this.start.column == column ? -1 : this.compare(row, column);
     };
     this.compareEnd = function(row, column) {
-        if (this.end.row == row && this.end.column == column) {
-            return 1;
-        } else {
-            return this.compare(row, column);
-        }
+        return this.end.row == row && this.end.column == column ? 1 : this.compare(row, column);
     };
     this.compareInside = function(row, column) {
         if (this.end.row == row && this.end.column == column) {
@@ -726,10 +706,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         return Range.fromPoints(this.start, this.end);
     };
     this.collapseRows = function() {
-        if (this.end.column == 0)
-            return new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0)
-        else
-            return new Range(this.start.row, 0, this.end.row, 0)
+        return this.end.column == 0 ? new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0) : new Range(this.start.row, 0, this.end.row, 0);
     };
     this.toScreenRange = function(session) {
         var screenPosStart = session.documentToScreenPosition(this.start);
@@ -825,10 +802,7 @@ var Anchor = exports.Anchor = function(doc, row, column) {
             }
         } else if (delta.action === "removeText") {
             if (start.row === row && start.column < column) {
-                if (end.column >= column)
-                    column = start.column;
-                else
-                    column = Math.max(0, column - (end.column - start.column));
+                column = end.column >= column ? start.column : Math.max(0, column - (end.column - start.column));
 
             } else if (start.row !== end.row && start.row < row) {
                 if (end.row === row)
@@ -853,14 +827,10 @@ var Anchor = exports.Anchor = function(doc, row, column) {
     };
     this.setPosition = function(row, column, noClip) {
         var pos;
-        if (noClip) {
-            pos = {
+        pos = noClip ? {
                 row: row,
                 column: column
-            };
-        } else {
-            pos = this.$clipPositionToDocument(row, column);
-        }
+            } : this.$clipPositionToDocument(row, column);
 
         if (this.row == pos.row && this.column == pos.column)
             return;
@@ -6062,7 +6032,7 @@ TreeBuilder.prototype.processToken = function(token) {
 
 	var currentNode = this.openElements.top || null;
 	var insertionMode;
-	if (!currentNode || !currentNode.isForeign() ||
+	insertionMode = !currentNode || !currentNode.isForeign() ||
 		(currentNode.isMathMLTextIntegrationPoint() &&
 			((token.type == 'StartTag' &&
 					!(token.name in {mglyph:0, malignmark:0})) ||
@@ -6075,12 +6045,7 @@ TreeBuilder.prototype.processToken = function(token) {
 		(currentNode.isHtmlIntegrationPoint() &&
 			token.type in {StartTag:0, Characters:0}
 		) ||
-		token.type == 'EOF'
-	) {
-		insertionMode = this.insertionMode;
-	} else {
-		insertionMode = this.insertionModes.inForeignContent;
-	}
+		token.type == 'EOF' ? this.insertionMode : this.insertionModes.inForeignContent;
 	switch(token.type) {
 	case 'Characters':
 		var buffer = new CharacterBuffer(token.data);
@@ -6347,10 +6312,7 @@ TreeBuilder.prototype.resetInsertionMode = function() {
 			if (node.localName === 'frameset')
 				return this.setInsertionMode('inFrameset');
 			if (node.localName === 'html')
-				if (!this.openElements.headElement)
-					return this.setInsertionMode('beforeHead');
-				else
-					return this.setInsertionMode('afterHead');
+				return !this.openElements.headElement ? this.setInsertionMode('beforeHead') : this.setInsertionMode('afterHead');
 		}
 
 		if (last)
@@ -7378,19 +7340,13 @@ TreeParser.prototype.startEntity = function(name, locator) {
 
 Object.defineProperty(TreeParser.prototype, 'columnNumber', {
 	get: function() {
-		if (!this.locatorDelegate)
-			return -1;
-		else
-			return this.locatorDelegate.columnNumber;
+		return !this.locatorDelegate ? -1 : this.locatorDelegate.columnNumber;
 	}
 });
 
 Object.defineProperty(TreeParser.prototype, 'lineNumber', {
 	get: function() {
-		if (!this.locatorDelegate)
-			return -1;
-		else
-			return this.locatorDelegate.lineNumber;
+		return !this.locatorDelegate ? -1 : this.locatorDelegate.lineNumber;
 	}
 });
 function NullLexicalHandler() {
@@ -9938,11 +9894,7 @@ exports.format = function(f) {
     }
   });
   for (var x = args[i]; i < len; x = args[++i]) {
-    if (isNull(x) || !isObject(x)) {
-      str += ' ' + x;
-    } else {
-      str += ' ' + inspect(x);
-    }
+    str += isNull(x) || !isObject(x) ? ' ' + x : ' ' + inspect(x);
   }
   return str;
 };
@@ -10045,12 +9997,8 @@ inspect.styles = {
 function stylizeWithColor(str, styleType) {
   var style = inspect.styles[styleType];
 
-  if (style) {
-    return '\u001b[' + inspect.colors[style][0] + 'm' + str +
-           '\u001b[' + inspect.colors[style][1] + 'm';
-  } else {
-    return str;
-  }
+  return style ? '\u001b[' + inspect.colors[style][0] + 'm' + str +
+           '\u001b[' + inspect.colors[style][1] + 'm' : str;
 }
 
 
@@ -10136,23 +10084,15 @@ function formatValue(ctx, value, recurseTimes) {
   }
 
   if (recurseTimes < 0) {
-    if (isRegExp(value)) {
-      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
-    } else {
-      return ctx.stylize('[Object]', 'special');
-    }
+    return isRegExp(value) ? ctx.stylize(RegExp.prototype.toString.call(value), 'regexp') : ctx.stylize('[Object]', 'special');
   }
 
   ctx.seen.push(value);
 
   var output;
-  if (array) {
-    output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
-  } else {
-    output = keys.map(function(key) {
+  output = array ? formatArray(ctx, value, recurseTimes, visibleKeys, keys) : keys.map(function(key) {
       return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
     });
-  }
 
   ctx.seen.pop();
 
@@ -10207,11 +10147,7 @@ function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
   var name, str, desc;
   desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
   if (desc.get) {
-    if (desc.set) {
-      str = ctx.stylize('[Getter/Setter]', 'special');
-    } else {
-      str = ctx.stylize('[Getter]', 'special');
-    }
+    str = desc.set ? ctx.stylize('[Getter/Setter]', 'special') : ctx.stylize('[Getter]', 'special');
   } else {
     if (desc.set) {
       str = ctx.stylize('[Setter]', 'special');
@@ -10222,21 +10158,13 @@ function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
   }
   if (!str) {
     if (ctx.seen.indexOf(desc.value) < 0) {
-      if (isNull(recurseTimes)) {
-        str = formatValue(ctx, desc.value, null);
-      } else {
-        str = formatValue(ctx, desc.value, recurseTimes - 1);
-      }
+      str = isNull(recurseTimes) ? formatValue(ctx, desc.value, null) : formatValue(ctx, desc.value, recurseTimes - 1);
       if (str.indexOf('\n') > -1) {
-        if (array) {
-          str = str.split('\n').map(function(line) {
+        str = array ? str.split('\n').map(function(line) {
             return '  ' + line;
-          }).join('\n').substr(2);
-        } else {
-          str = '\n' + str.split('\n').map(function(line) {
+          }).join('\n').substr(2) : '\n' + str.split('\n').map(function(line) {
             return '   ' + line;
           }).join('\n');
-        }
       }
     } else {
       str = ctx.stylize('[Circular]', 'special');
@@ -10497,11 +10425,7 @@ EventEmitter.prototype.addListener = function(type, listener) {
     this._events[type] = [this._events[type], listener];
   if (isObject(this._events[type]) && !this._events[type].warned) {
     var m;
-    if (!isUndefined(this._maxListeners)) {
-      m = this._maxListeners;
-    } else {
-      m = EventEmitter.defaultMaxListeners;
-    }
+    m = !isUndefined(this._maxListeners) ? this._maxListeners : EventEmitter.defaultMaxListeners;
 
     if (m && m > 0 && this._events[type].length > m) {
       this._events[type].warned = true;
@@ -10900,14 +10824,10 @@ if ([1,2].splice(0).length != 2) {
     }()) {//IE 6/7
         var array_splice = Array.prototype.splice;
         Array.prototype.splice = function(start, deleteCount) {
-            if (!arguments.length) {
-                return [];
-            } else {
-                return array_splice.apply(this, [
+            return !arguments.length ? [] : array_splice.apply(this, [
                     start === void 0 ? 0 : start,
                     deleteCount === void 0 ? (this.length - start) : deleteCount
-                ].concat(slice.call(arguments, 2)))
-            }
+                ].concat(slice.call(arguments, 2)));
         };
     } else {//IE8
         Array.prototype.splice = function(pos, removeCount){
@@ -11244,12 +11164,9 @@ if (!Object.getOwnPropertyNames) {
 }
 if (!Object.create) {
     var createEmpty;
-    if (Object.prototype.__proto__ === null) {
-        createEmpty = function () {
+    createEmpty = Object.prototype.__proto__ === null ? function () {
             return { "__proto__": null };
-        };
-    } else {
-        createEmpty = function () {
+        } : function () {
             var empty = {};
             for (var i in empty)
                 empty[i] = null;
@@ -11262,8 +11179,7 @@ if (!Object.create) {
             empty.valueOf =
             empty.__proto__ = null;
             return empty;
-        }
-    }
+        };
 
     Object.create = function create(prototype, properties) {
         var object;
@@ -11365,11 +11281,7 @@ try {
 } catch (exception) {
     Object.freeze = (function freeze(freezeObject) {
         return function freeze(object) {
-            if (typeof object == "function") {
-                return object;
-            } else {
-                return freezeObject(object);
-            }
+            return typeof object == "function" ? object : freezeObject(object);
         };
     })(Object.freeze);
 }

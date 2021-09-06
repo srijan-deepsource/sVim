@@ -854,11 +854,7 @@ var FtlLangHighlightRules = function () {
             next : "qstring"
         }, {
             token : function(value) {
-                if (value.match("^[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?$")) {
-                    return "constant.numeric";
-                } else {
-                    return "variable";
-                }
+                return value.match("^[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?$") ? "constant.numeric" : "variable";
             },
             regex : /[\w.+\-]+/
         }, {

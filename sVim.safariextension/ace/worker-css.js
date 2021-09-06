@@ -618,31 +618,19 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
     };
     this.inside = function(row, column) {
         if (this.compare(row, column) == 0) {
-            if (this.isEnd(row, column) || this.isStart(row, column)) {
-                return false;
-            } else {
-                return true;
-            }
+            return this.isEnd(row, column) || this.isStart(row, column) ? false : true;
         }
         return false;
     };
     this.insideStart = function(row, column) {
         if (this.compare(row, column) == 0) {
-            if (this.isEnd(row, column)) {
-                return false;
-            } else {
-                return true;
-            }
+            return this.isEnd(row, column) ? false : true;
         }
         return false;
     };
     this.insideEnd = function(row, column) {
         if (this.compare(row, column) == 0) {
-            if (this.isStart(row, column)) {
-                return false;
-            } else {
-                return true;
-            }
+            return this.isStart(row, column) ? false : true;
         }
         return false;
     };
@@ -668,18 +656,10 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         return 0;
     };
     this.compareStart = function(row, column) {
-        if (this.start.row == row && this.start.column == column) {
-            return -1;
-        } else {
-            return this.compare(row, column);
-        }
+        return this.start.row == row && this.start.column == column ? -1 : this.compare(row, column);
     };
     this.compareEnd = function(row, column) {
-        if (this.end.row == row && this.end.column == column) {
-            return 1;
-        } else {
-            return this.compare(row, column);
-        }
+        return this.end.row == row && this.end.column == column ? 1 : this.compare(row, column);
     };
     this.compareInside = function(row, column) {
         if (this.end.row == row && this.end.column == column) {
@@ -726,10 +706,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         return Range.fromPoints(this.start, this.end);
     };
     this.collapseRows = function() {
-        if (this.end.column == 0)
-            return new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0)
-        else
-            return new Range(this.start.row, 0, this.end.row, 0)
+        return this.end.column == 0 ? new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0) : new Range(this.start.row, 0, this.end.row, 0);
     };
     this.toScreenRange = function(session) {
         var screenPosStart = session.documentToScreenPosition(this.start);
@@ -825,10 +802,7 @@ var Anchor = exports.Anchor = function(doc, row, column) {
             }
         } else if (delta.action === "removeText") {
             if (start.row === row && start.column < column) {
-                if (end.column >= column)
-                    column = start.column;
-                else
-                    column = Math.max(0, column - (end.column - start.column));
+                column = end.column >= column ? start.column : Math.max(0, column - (end.column - start.column));
 
             } else if (start.row !== end.row && start.row < row) {
                 if (end.row === row)
@@ -853,14 +827,10 @@ var Anchor = exports.Anchor = function(doc, row, column) {
     };
     this.setPosition = function(row, column, noClip) {
         var pos;
-        if (noClip) {
-            pos = {
+        pos = noClip ? {
                 row: row,
                 column: column
-            };
-        } else {
-            pos = this.$clipPositionToDocument(row, column);
-        }
+            } : this.$clipPositionToDocument(row, column);
 
         if (this.row == pos.row && this.column == pos.column)
             return;
@@ -1628,13 +1598,9 @@ TokenStreamBase.prototype = {
             this._ltIndex = this._lt.length;
         }
         info = tokenInfo[token.type];
-        if (info &&
+        return info &&
                 (info.hide ||
-                (info.channel !== undefined && channel !== info.channel))){
-            return this.get(channel);
-        } else {
-            return token.type;
-        }
+                (info.channel !== undefined && channel !== info.channel)) ? this.get(channel) : token.type;
     },
     LA: function(index){
         var total = index,
@@ -1677,11 +1643,7 @@ TokenStreamBase.prototype = {
         return this._token;
     },
     tokenName: function(tokenType){
-        if (tokenType < 0 || tokenType > this._tokenData.length){
-            return "UNKNOWN_TOKEN";
-        } else {
-            return this._tokenData[tokenType].name;
-        }
+        return tokenType < 0 || tokenType > this._tokenData.length ? "UNKNOWN_TOKEN" : this._tokenData[tokenType].name;
     },
     tokenType: function(tokenName){
         return this._tokenData[tokenName] || -1;
@@ -2402,18 +2364,13 @@ Parser.prototype = function(){
 
                 var tokenStream = this._tokenStream;
 
-                if(tokenStream.match([Tokens.TOPLEFTCORNER_SYM, Tokens.TOPLEFT_SYM,
+                return tokenStream.match([Tokens.TOPLEFTCORNER_SYM, Tokens.TOPLEFT_SYM,
                         Tokens.TOPCENTER_SYM, Tokens.TOPRIGHT_SYM, Tokens.TOPRIGHTCORNER_SYM,
                         Tokens.BOTTOMLEFTCORNER_SYM, Tokens.BOTTOMLEFT_SYM,
                         Tokens.BOTTOMCENTER_SYM, Tokens.BOTTOMRIGHT_SYM,
                         Tokens.BOTTOMRIGHTCORNER_SYM, Tokens.LEFTTOP_SYM,
                         Tokens.LEFTMIDDLE_SYM, Tokens.LEFTBOTTOM_SYM, Tokens.RIGHTTOP_SYM,
-                        Tokens.RIGHTMIDDLE_SYM, Tokens.RIGHTBOTTOM_SYM]))
-                {
-                    return SyntaxUnit.fromToken(tokenStream.token());
-                } else {
-                    return null;
-                }
+                        Tokens.RIGHTMIDDLE_SYM, Tokens.RIGHTBOTTOM_SYM]) ? SyntaxUnit.fromToken(tokenStream.token()) : null;
 
             },
 
@@ -2512,11 +2469,7 @@ Parser.prototype = function(){
 
                 var tokenStream = this._tokenStream;
 
-                if (tokenStream.match([Tokens.MINUS, Tokens.PLUS])){
-                    return tokenStream.token().value;
-                } else {
-                    return null;
-                }
+                return tokenStream.match([Tokens.MINUS, Tokens.PLUS]) ? tokenStream.token().value : null;
             },
 
             _property: function(){
@@ -2983,11 +2936,7 @@ Parser.prototype = function(){
                 if (arg === null){
                     this._unexpectedToken(tokenStream.LT(1));
                 }
-                if (arg.type == "elementName"){
-                    part = new SelectorPart(arg, [], arg.toString(), line, col);
-                } else {
-                    part = new SelectorPart(null, [arg], arg.toString(), line, col);
-                }
+                part = arg.type == "elementName" ? new SelectorPart(arg, [], arg.toString(), line, col) : new SelectorPart(null, [arg], arg.toString(), line, col);
 
                 return part;
             },
@@ -3124,11 +3073,7 @@ Parser.prototype = function(){
                             col = tokenStream.LT(1).startCol;
                         }
                         if (value === null){
-                            if (tokenStream.LA(3) == Tokens.EQUALS && this.options.ieFilters){
-                                value = this._ie_function();
-                            } else {
-                                value = this._function();
-                            }
+                            value = tokenStream.LA(3) == Tokens.EQUALS && this.options.ieFilters ? this._ie_function() : this._function();
                         }
 
                     } else {
@@ -3571,11 +3516,8 @@ var Properties = {
 
         if (expression.hasNext()) {
             part = expression.next();
-            if (valid) {
-                throw new ValidationError("Expected end of value but found '" + part + "'.", part.line, part.col);
-            } else {
-                throw new ValidationError("Expected (<'azimuth'>) but found '" + part + "'.", part.line, part.col);
-            }
+            const error = valid ? new ValidationError("Expected end of value but found '" + part + "'.", part.line, part.col) : new ValidationError("Expected (<'azimuth'>) but found '" + part + "'.", part.line, part.col);
+            throw error;
         }
     },
     "backface-visibility"           : "visible | hidden",
@@ -3639,11 +3581,8 @@ var Properties = {
 
         if (expression.hasNext()) {
             part = expression.next();
-            if (valid) {
-                throw new ValidationError("Expected end of value but found '" + part + "'.", part.line, part.col);
-            } else {
-                throw new ValidationError("Expected ([<number> | <percentage>]{1,4} && fill?) but found '" + part + "'.", part.line, part.col);
-            }
+            const error = valid ? new ValidationError("Expected end of value but found '" + part + "'.", part.line, part.col) : new ValidationError("Expected ([<number> | <percentage>]{1,4} && fill?) but found '" + part + "'.", part.line, part.col);
+            throw error;
         }
     },
     "border-image-source"           : "<image> | none",
@@ -3679,11 +3618,8 @@ var Properties = {
 
         if (expression.hasNext()) {
             part = expression.next();
-            if (valid) {
-                throw new ValidationError("Expected end of value but found '" + part + "'.", part.line, part.col);
-            } else {
-                throw new ValidationError("Expected (<'border-radius'>) but found '" + part + "'.", part.line, part.col);
-            }
+            const error = valid ? new ValidationError("Expected end of value but found '" + part + "'.", part.line, part.col) : new ValidationError("Expected (<'border-radius'>) but found '" + part + "'.", part.line, part.col);
+            throw error;
         }
     },
     "border-right"                  : "<border-width> || <border-style> || <color>",
@@ -4363,40 +4299,24 @@ TokenStream.prototype = mix(new TokenStreamBase(), {
             switch(c){
                 case "/":
 
-                    if(reader.peek() == "*"){
-                        token = this.commentToken(c, startLine, startCol);
-                    } else {
-                        token = this.charToken(c, startLine, startCol);
-                    }
+                    token = reader.peek() == "*" ? this.commentToken(c, startLine, startCol) : this.charToken(c, startLine, startCol);
                     break;
                 case "|":
                 case "~":
                 case "^":
                 case "$":
                 case "*":
-                    if(reader.peek() == "="){
-                        token = this.comparisonToken(c, startLine, startCol);
-                    } else {
-                        token = this.charToken(c, startLine, startCol);
-                    }
+                    token = reader.peek() == "=" ? this.comparisonToken(c, startLine, startCol) : this.charToken(c, startLine, startCol);
                     break;
                 case "\"":
                 case "'":
                     token = this.stringToken(c, startLine, startCol);
                     break;
                 case "#":
-                    if (isNameChar(reader.peek())){
-                        token = this.hashToken(c, startLine, startCol);
-                    } else {
-                        token = this.charToken(c, startLine, startCol);
-                    }
+                    token = isNameChar(reader.peek()) ? this.hashToken(c, startLine, startCol) : this.charToken(c, startLine, startCol);
                     break;
                 case ".":
-                    if (isDigit(reader.peek())){
-                        token = this.numberToken(c, startLine, startCol);
-                    } else {
-                        token = this.charToken(c, startLine, startCol);
-                    }
+                    token = isDigit(reader.peek()) ? this.numberToken(c, startLine, startCol) : this.charToken(c, startLine, startCol);
                     break;
                 case "-":
                     if (reader.peek() == "-"){  //could be closing HTML-style comment
@@ -4826,11 +4746,7 @@ TokenStream.prototype = mix(new TokenStreamBase(), {
             reader.read();
             c = reader.peek();
         }
-        if (c == "'" || c == "\""){
-            inner = this.readString();
-        } else {
-            inner = this.readURL();
-        }
+        inner = c == "'" || c == "\"" ? this.readString() : this.readURL();
 
         c = reader.peek();
         while(c && isWhitespace(c)){
@@ -5174,11 +5090,8 @@ var Validation = {
                 throw new ValidationError("Expected end of value but found '" + part + "'.", part.line, part.col);
             } else {
                 part = expression.previous();
-                if (comma && part == ",") {
-                    throw new ValidationError("Expected end of value but found '" + part + "'.", part.line, part.col);
-                } else {
-                    throw new ValidationError("Expected (" + types + ") but found '" + value + "'.", value.line, value.col);
-                }
+                const error = comma && part == "," ? new ValidationError("Expected end of value but found '" + part + "'.", part.line, part.col) : new ValidationError("Expected (" + types + ") but found '" + value + "'.", value.line, value.col);
+                throw error;
             }
 
         } else if (expression.hasNext()) {
@@ -5344,11 +5257,7 @@ var ValidationTypes = {
         },
 
         "<length>": function(part){
-            if (part.type == "function" && /^(?:\-(?:ms|moz|o|webkit)\-)?calc/i.test(part)){
-                return true;
-            }else{
-                return part.type == "length" || part.type == "number" || part.type == "integer" || part == "0";
-            }
+            return part.type == "function" && /^(?:\-(?:ms|moz|o|webkit)\-)?calc/i.test(part) ? true : part.type == "length" || part.type == "number" || part.type == "integer" || part == "0";
         },
 
         "<color>": function(part){
@@ -6699,17 +6608,13 @@ CSSLint.addRule({
             lastRule;
 
         function startRule(event){
-            if (event.selectors){
-                lastRule = {
+            lastRule = event.selectors ? {
                     line: event.line,
                     col: event.col,
                     selectors: event.selectors,
                     propCount: 0,
                     outline: false
-                };
-            } else {
-                lastRule = null;
-            }
+                } : null;
         }
         
         function endRule(event){
@@ -7433,12 +7338,8 @@ CSSLint.addFormatter({
         }
 
         CSSLint.Util.forEach(messages, function(message, i) {
-            if (message.rollup) {
-                output += filename + ": " + capitalize(message.type) + " - " + message.message + "\n";
-            } else {
-                output += filename + ": " + "line " + message.line + 
+            output += message.rollup ? filename + ": " + capitalize(message.type) + " - " + message.message + "\n" : filename + ": " + "line " + message.line + 
                     ", col " + message.col + ", " + capitalize(message.type) + " - " + message.message + " (" + message.rule.id + ")\n";
-            }
         });
     
         return output;
@@ -7770,14 +7671,10 @@ if ([1,2].splice(0).length != 2) {
     }()) {//IE 6/7
         var array_splice = Array.prototype.splice;
         Array.prototype.splice = function(start, deleteCount) {
-            if (!arguments.length) {
-                return [];
-            } else {
-                return array_splice.apply(this, [
+            return !arguments.length ? [] : array_splice.apply(this, [
                     start === void 0 ? 0 : start,
                     deleteCount === void 0 ? (this.length - start) : deleteCount
-                ].concat(slice.call(arguments, 2)))
-            }
+                ].concat(slice.call(arguments, 2)));
         };
     } else {//IE8
         Array.prototype.splice = function(pos, removeCount){
@@ -8114,12 +8011,9 @@ if (!Object.getOwnPropertyNames) {
 }
 if (!Object.create) {
     var createEmpty;
-    if (Object.prototype.__proto__ === null) {
-        createEmpty = function () {
+    createEmpty = Object.prototype.__proto__ === null ? function () {
             return { "__proto__": null };
-        };
-    } else {
-        createEmpty = function () {
+        } : function () {
             var empty = {};
             for (var i in empty)
                 empty[i] = null;
@@ -8132,8 +8026,7 @@ if (!Object.create) {
             empty.valueOf =
             empty.__proto__ = null;
             return empty;
-        }
-    }
+        };
 
     Object.create = function create(prototype, properties) {
         var object;
@@ -8235,11 +8128,7 @@ try {
 } catch (exception) {
     Object.freeze = (function freeze(freezeObject) {
         return function freeze(object) {
-            if (typeof object == "function") {
-                return object;
-            } else {
-                return freezeObject(object);
-            }
+            return typeof object == "function" ? object : freezeObject(object);
         };
     })(Object.freeze);
 }

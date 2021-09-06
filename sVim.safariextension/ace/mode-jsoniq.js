@@ -57,14 +57,7 @@ module.exports = (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=ty
   this.getExpectedTokenSet = function(e)
   {
     var expected;
-    if (e.getExpected() < 0)
-    {
-      expected = JSONiqTokenizer.getTokenSet(- e.getState());
-    }
-    else
-    {
-      expected = [JSONiqTokenizer.TOKEN[e.getExpected()]];
-    }
+    expected = e.getExpected() < 0 ? JSONiqTokenizer.getTokenSet(- e.getState()) : [JSONiqTokenizer.TOKEN[e.getExpected()]];
     return expected;
   };
 

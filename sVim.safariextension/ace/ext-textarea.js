@@ -204,11 +204,7 @@ var getCSSProperty = function(element, container, property) {
     var ret = element.style[property];
 
     if (!ret) {
-        if (window.getComputedStyle) {
-            ret = window.getComputedStyle(element, '').getPropertyValue(property);
-        } else {
-            ret = element.currentStyle[property];
-        }
+        ret = window.getComputedStyle ? window.getComputedStyle(element, '').getPropertyValue(property) : element.currentStyle[property];
     }
 
     if (!ret || ret == 'auto' || ret == 'intrinsic') {
