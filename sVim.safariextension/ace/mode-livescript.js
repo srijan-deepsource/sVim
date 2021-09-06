@@ -69,11 +69,7 @@ ace.define("ace/mode/livescript",["require","exports","module","ace/tokenizer","
       range = new (require('../range')).Range(0, 0, 0, 0);
       for (i$ = startRow; i$ <= endRow; ++i$) {
         i = i$;
-        if (out = comment.test(line = doc.getLine(i))) {
-          line = line.replace(comment, '$1');
-        } else {
-          line = line.replace(/^\s*/, '$&#');
-        }
+        line = (out = comment.test(line = doc.getLine(i))) ? line.replace(comment, '$1') : line.replace(/^\s*/, '$&#');
         range.end.row = range.start.row = i;
         range.end.column = line.length + 1;
         doc.replace(range, line);

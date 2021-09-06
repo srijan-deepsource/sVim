@@ -232,11 +232,7 @@ oop.inherits(Mode, TextMode);
 
     this.$toIndent = function(str) {
         return str.split('').map(function(ch) {
-            if (/\s/.exec(ch)) {
-                return ch;
-            } else {
-                return ' ';
-            }
+            return /\s/.exec(ch) ? ch : ' ';
         }).join('');
     };
 
@@ -266,11 +262,7 @@ oop.inherits(Mode, TextMode);
             while (true) {
                 ch = line[i];
                 if (ch === ' ' || ch === '\t') {
-                    if(this.minorIndentFunctions.indexOf(fn) !== -1) {
-                        return this.$toIndent(line.substring(0, iBefore - 1) + tab);
-                    } else {
-                        return this.$toIndent(line.substring(0, i + 1));
-                    }
+                    return this.minorIndentFunctions.indexOf(fn) !== -1 ? this.$toIndent(line.substring(0, iBefore - 1) + tab) : this.$toIndent(line.substring(0, i + 1));
                 } else if (ch === undefined) {
                     return this.$toIndent(line.substring(0, iBefore - 1) + tab);
                 }

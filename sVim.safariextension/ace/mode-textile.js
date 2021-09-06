@@ -9,10 +9,7 @@ var TextileHighlightRules = function() {
         "start" : [
             {
                 token : function(value) {
-                    if (value.charAt(0) == "h")
-                        return "markup.heading." + value.charAt(1);
-                    else
-                        return "markup.heading";
+                    return value.charAt(0) == "h" ? "markup.heading." + value.charAt(1) : "markup.heading";
                 },
                 regex : "h1|h2|h3|h4|h5|h6|bq|p|bc|pre",
                 next  : "blocktag"

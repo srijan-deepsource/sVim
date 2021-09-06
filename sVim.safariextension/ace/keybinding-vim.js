@@ -123,10 +123,7 @@ module.exports = {
         if (ch.length === 1)
             return ch;
 
-        if (/^shift-./.test(ch))
-            return ch[ch.length - 1].toUpperCase();
-        else
-            return "";
+        return /^shift-./.test(ch) ? ch[ch.length - 1].toUpperCase() : "";
     },
     copyLine: function(editor) {
         var pos = editor.getCursorPosition();

@@ -158,10 +158,7 @@ oop.inherits(FoldMode, BaseFoldMode);
         else
             session.foldWidgets[row - 1] = "";
 
-        if (indent < nextIndent)
-            return "start";
-        else
-            return "";
+        return indent < nextIndent ? "start" : "";
     };
 
 }).call(FoldMode.prototype);

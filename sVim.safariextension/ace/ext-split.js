@@ -139,11 +139,7 @@ var Split = function(container, theme, splits) {
     };
     this.setSession = function(session, idx) {
         var editor;
-        if (idx == null) {
-            editor = this.$cEditor;
-        } else {
-            editor = this.$editors[idx];
-        }
+        editor = idx == null ? this.$cEditor : this.$editors[idx];
         var isUsed = this.$editors.some(function(editor) {
            return editor.session === session;
         });

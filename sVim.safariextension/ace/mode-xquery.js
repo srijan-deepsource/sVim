@@ -57,14 +57,7 @@ module.exports = (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=ty
   this.getExpectedTokenSet = function(e)
   {
     var expected;
-    if (e.getExpected() < 0)
-    {
-      expected = XQueryTokenizer.getTokenSet(- e.getState());
-    }
-    else
-    {
-      expected = [XQueryTokenizer.TOKEN[e.getExpected()]];
-    }
+    expected = e.getExpected() < 0 ? XQueryTokenizer.getTokenSet(- e.getState()) : [XQueryTokenizer.TOKEN[e.getExpected()]];
     return expected;
   };
 

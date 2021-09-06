@@ -431,31 +431,19 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
     };
     this.inside = function(row, column) {
         if (this.compare(row, column) == 0) {
-            if (this.isEnd(row, column) || this.isStart(row, column)) {
-                return false;
-            } else {
-                return true;
-            }
+            return this.isEnd(row, column) || this.isStart(row, column) ? false : true;
         }
         return false;
     };
     this.insideStart = function(row, column) {
         if (this.compare(row, column) == 0) {
-            if (this.isEnd(row, column)) {
-                return false;
-            } else {
-                return true;
-            }
+            return this.isEnd(row, column) ? false : true;
         }
         return false;
     };
     this.insideEnd = function(row, column) {
         if (this.compare(row, column) == 0) {
-            if (this.isStart(row, column)) {
-                return false;
-            } else {
-                return true;
-            }
+            return this.isStart(row, column) ? false : true;
         }
         return false;
     };
@@ -481,18 +469,10 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         return 0;
     };
     this.compareStart = function(row, column) {
-        if (this.start.row == row && this.start.column == column) {
-            return -1;
-        } else {
-            return this.compare(row, column);
-        }
+        return this.start.row == row && this.start.column == column ? -1 : this.compare(row, column);
     };
     this.compareEnd = function(row, column) {
-        if (this.end.row == row && this.end.column == column) {
-            return 1;
-        } else {
-            return this.compare(row, column);
-        }
+        return this.end.row == row && this.end.column == column ? 1 : this.compare(row, column);
     };
     this.compareInside = function(row, column) {
         if (this.end.row == row && this.end.column == column) {
@@ -539,10 +519,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         return Range.fromPoints(this.start, this.end);
     };
     this.collapseRows = function() {
-        if (this.end.column == 0)
-            return new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0)
-        else
-            return new Range(this.start.row, 0, this.end.row, 0)
+        return this.end.column == 0 ? new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0) : new Range(this.start.row, 0, this.end.row, 0);
     };
     this.toScreenRange = function(session) {
         var screenPosStart = session.documentToScreenPosition(this.start);
@@ -638,10 +615,7 @@ var Anchor = exports.Anchor = function(doc, row, column) {
             }
         } else if (delta.action === "removeText") {
             if (start.row === row && start.column < column) {
-                if (end.column >= column)
-                    column = start.column;
-                else
-                    column = Math.max(0, column - (end.column - start.column));
+                column = end.column >= column ? start.column : Math.max(0, column - (end.column - start.column));
 
             } else if (start.row !== end.row && start.row < row) {
                 if (end.row === row)
@@ -666,14 +640,10 @@ var Anchor = exports.Anchor = function(doc, row, column) {
     };
     this.setPosition = function(row, column, noClip) {
         var pos;
-        if (noClip) {
-            pos = {
+        pos = noClip ? {
                 row: row,
                 column: column
-            };
-        } else {
-            pos = this.$clipPositionToDocument(row, column);
-        }
+            } : this.$clipPositionToDocument(row, column);
 
         if (this.row == pos.row && this.column == pos.column)
             return;
@@ -1592,11 +1562,7 @@ ace.define("ace/mode/coffee/rewriter",["require","exports","module"], function(r
           return forward(3);
         }
         if (tag === ':') {
-          if (this.tag(i - 2) === '@') {
-            s = i - 2;
-          } else {
-            s = i - 1;
-          }
+          s = this.tag(i - 2) === '@' ? i - 2 : i - 1;
           while (this.tag(s - 2) === 'HERECOMMENT') {
             s -= 2;
           }
@@ -1931,16 +1897,12 @@ ace.define("ace/mode/coffee/helpers",["require","exports","module"], function(re
   };
 
   buildLocationData = function(first, last) {
-    if (!last) {
-      return first;
-    } else {
-      return {
+    return !last ? first : {
         first_line: first.first_line,
         first_column: first.first_column,
         last_line: last.last_line,
         last_column: last.last_column
       };
-    }
   };
 
   exports.addLocationDataFn = function(first, last) {
@@ -1959,11 +1921,7 @@ ace.define("ace/mode/coffee/helpers",["require","exports","module"], function(re
     } else if ("first_line" in obj) {
       locationData = obj;
     }
-    if (locationData) {
-      return ("" + (locationData.first_line + 1) + ":" + (locationData.first_column + 1) + "-") + ("" + (locationData.last_line + 1) + ":" + (locationData.last_column + 1));
-    } else {
-      return "No location data";
-    }
+    return locationData ? ("" + (locationData.first_line + 1) + ":" + (locationData.first_column + 1) + "-") + ("" + (locationData.last_line + 1) + ":" + (locationData.last_column + 1)) : "No location data";
   };
 
   exports.baseFileName = function(file, stripExt, useWinPathSep) {
@@ -2457,11 +2415,7 @@ ace.define("ace/mode/coffee/lexer",["require","exports","module","ace/mode/coffe
       if (prev) {
         prev[match ? 'spaced' : 'newLine'] = true;
       }
-      if (match) {
-        return match[0].length;
-      } else {
-        return 0;
-      }
+      return match ? match[0].length : 0;
     };
 
     Lexer.prototype.newlineToken = function(offset) {
@@ -2754,11 +2708,7 @@ ace.define("ace/mode/coffee/lexer",["require","exports","module","ace/mode/coffe
       if (offset === 0) {
         return [this.chunkLine, this.chunkColumn];
       }
-      if (offset >= this.chunk.length) {
-        string = this.chunk;
-      } else {
-        string = this.chunk.slice(0, +(offset - 1) + 1 || 9e9);
-      }
+      string = offset >= this.chunk.length ? this.chunk : this.chunk.slice(0, +(offset - 1) + 1 || 9e9);
       lineCount = count(string, '\n');
       column = this.chunkColumn;
       if (lineCount > 0) {
@@ -2814,17 +2764,9 @@ ace.define("ace/mode/coffee/lexer",["require","exports","module","ace/mode/coffe
 
     Lexer.prototype.escapeLines = function(str, heredoc) {
       str = str.replace(/\\[^\S\n]*(\n|\\)\s*/g, function(escaped, character) {
-        if (character === '\n') {
-          return '';
-        } else {
-          return escaped;
-        }
+        return character === '\n' ? '' : escaped;
       });
-      if (heredoc) {
-        return str.replace(MULTILINER, '\\n');
-      } else {
-        return str.replace(/\s*\n\s*/g, ' ');
-      }
+      return heredoc ? str.replace(MULTILINER, '\\n') : str.replace(/\s*\n\s*/g, ' ');
     };
 
     Lexer.prototype.makeString = function(body, quote, heredoc) {
@@ -2832,11 +2774,7 @@ ace.define("ace/mode/coffee/lexer",["require","exports","module","ace/mode/coffe
         return quote + quote;
       }
       body = body.replace(RegExp("\\\\(" + quote + "|\\\\)", "g"), function(match, contents) {
-        if (contents === quote) {
-          return contents;
-        } else {
-          return match;
-        }
+        return contents === quote ? contents : match;
       });
       body = body.replace(RegExp("" + quote, "g"), '\\$&');
       return quote + this.escapeLines(body, heredoc) + quote;
@@ -3424,11 +3362,7 @@ break;
 case 199:this.$ = yy.addLocationDataFn(_$[$0-2], _$[$0])(new yy.Op($$[$0-1], $$[$0-2], $$[$0]));
 break;
 case 200:this.$ = yy.addLocationDataFn(_$[$0-2], _$[$0])((function () {
-        if ($$[$0-1].charAt(0) === '!') {
-          return new yy.Op($$[$0-1].slice(1), $$[$0-2], $$[$0]).invert();
-        } else {
-          return new yy.Op($$[$0-1], $$[$0-2], $$[$0]);
-        }
+        return $$[$0-1].charAt(0) === '!' ? new yy.Op($$[$0-1].slice(1), $$[$0-2], $$[$0]).invert() : new yy.Op($$[$0-1], $$[$0-2], $$[$0]);
       }()));
 break;
 case 201:this.$ = yy.addLocationDataFn(_$[$0-2], _$[$0])(new yy.Assign($$[$0-2], $$[$0], $$[$0-1]));
@@ -3501,11 +3435,7 @@ parse: function parse(input) {
                         expected.push('\'' + this.terminals_[p] + '\'');
                     }
                 }
-                if (this.lexer.showPosition) {
-                    errStr = 'Expecting ' + expected.join(', ') + ', got \'' + (this.terminals_[symbol] || symbol) + '\'';
-                } else {
-                    errStr = 'Unexpected ' + (symbol == EOF ? 'end of input' : '\'' + (this.terminals_[symbol] || symbol) + '\'');
-                }
+                errStr = this.lexer.showPosition ? 'Expecting ' + expected.join(', ') + ', got \'' + (this.terminals_[symbol] || symbol) + '\'' : 'Unexpected ' + (symbol == EOF ? 'end of input' : '\'' + (this.terminals_[symbol] || symbol) + '\'');
                 if (this.lexer.yylloc.first_line !== yyloc.first_line) yyloc = this.lexer.yylloc;
                 this.parseError(errStr, {
                     text: this.lexer.match,
@@ -3614,14 +3544,10 @@ ace.define("ace/mode/coffee/scope",["require","exports","module","ace/mode/coffe
       if (this.shared && !immediate) {
         return this.parent.add(name, type, immediate);
       }
-      if (Object.prototype.hasOwnProperty.call(this.positions, name)) {
-        return this.variables[this.positions[name]].type = type;
-      } else {
-        return this.positions[name] = this.variables.push({
+      return Object.prototype.hasOwnProperty.call(this.positions, name) ? (this.variables[this.positions[name]].type = type) : (this.positions[name] = this.variables.push({
           name: name,
           type: type
-        }) - 1;
-      }
+        }) - 1);
     };
 
     Scope.prototype.namedMethod = function() {
@@ -3653,11 +3579,7 @@ ace.define("ace/mode/coffee/scope",["require","exports","module","ace/mode/coffe
     };
 
     Scope.prototype.temporary = function(name, index) {
-      if (name.length > 1) {
-        return '_' + name + (index > 1 ? index - 1 : '');
-      } else {
-        return '_' + (index + parseInt(name, 36)).toString(36).replace(/\d/g, 'a');
-      }
+      return name.length > 1 ? '_' + name + (index > 1 ? index - 1 : '') : '_' + (index + parseInt(name, 36)).toString(36).replace(/\d/g, 'a');
     };
 
     Scope.prototype.type = function(name) {
@@ -3814,11 +3736,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
       }
       node = this.unfoldSoak(o) || this;
       node.tab = o.indent;
-      if (o.level === LEVEL_TOP || !node.isStatement(o)) {
-        return node.compileNode(o);
-      } else {
-        return node.compileClosure(o);
-      }
+      return o.level === LEVEL_TOP || !node.isStatement(o) ? node.compileNode(o) : node.compileClosure(o);
     };
 
     Base.prototype.compileClosure = function(o) {
@@ -3850,11 +3768,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
       } else {
         ref = new Literal(reused || o.scope.freeVariable('ref'));
         sub = new Assign(ref, this);
-        if (level) {
-          return [sub.compileToFragments(o, level), [this.makeCode(ref.value)]];
-        } else {
-          return [sub, ref];
-        }
+        return level ? [sub.compileToFragments(o, level), [this.makeCode(ref.value)]] : [sub, ref];
       }
     };
 
@@ -3865,11 +3779,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
     Base.prototype.makeReturn = function(res) {
       var me;
       me = this.unwrapAll();
-      if (res) {
-        return new Call(new Literal("" + res + ".push"), [me]);
-      } else {
-        return new Return(me);
-      }
+      return res ? new Call(new Literal("" + res + ".push"), [me]) : new Return(me);
     };
 
     Base.prototype.contains = function(pred) {
@@ -4038,11 +3948,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
     };
 
     Block.prototype.unwrap = function() {
-      if (this.expressions.length === 1) {
-        return this.expressions[0];
-      } else {
-        return this;
-      }
+      return this.expressions.length === 1 ? this.expressions[0] : this;
     };
 
     Block.prototype.isEmpty = function() {
@@ -4092,11 +3998,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
       if (o == null) {
         o = {};
       }
-      if (o.scope) {
-        return Block.__super__.compileToFragments.call(this, o, level);
-      } else {
-        return this.compileRoot(o);
-      }
+      return o.scope ? Block.__super__.compileToFragments.call(this, o, level) : this.compileRoot(o);
     };
 
     Block.prototype.compileNode = function(o) {
@@ -4124,22 +4026,10 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
         }
       }
       if (top) {
-        if (this.spaced) {
-          return [].concat(this.joinFragmentArrays(compiledNodes, '\n\n'), this.makeCode("\n"));
-        } else {
-          return this.joinFragmentArrays(compiledNodes, '\n');
-        }
+        return this.spaced ? [].concat(this.joinFragmentArrays(compiledNodes, '\n\n'), this.makeCode("\n")) : this.joinFragmentArrays(compiledNodes, '\n');
       }
-      if (compiledNodes.length) {
-        answer = this.joinFragmentArrays(compiledNodes, ', ');
-      } else {
-        answer = [this.makeCode("void 0")];
-      }
-      if (compiledNodes.length > 1 && o.level >= LEVEL_LIST) {
-        return this.wrapInBraces(answer);
-      } else {
-        return answer;
-      }
+      answer = compiledNodes.length ? this.joinFragmentArrays(compiledNodes, ', ') : [this.makeCode("void 0")];
+      return compiledNodes.length > 1 && o.level >= LEVEL_LIST ? this.wrapInBraces(answer) : answer;
     };
 
     Block.prototype.compileRoot = function(o) {
@@ -4252,11 +4142,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
     }
 
     Literal.prototype.makeReturn = function() {
-      if (this.isStatement()) {
-        return this;
-      } else {
-        return Literal.__super__.makeReturn.apply(this, arguments);
-      }
+      return this.isStatement() ? this : Literal.__super__.makeReturn.apply(this, arguments);
     };
 
     Literal.prototype.isAssignable = function() {
@@ -4375,11 +4261,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
     Return.prototype.compileToFragments = function(o, level) {
       var expr, _ref2;
       expr = (_ref2 = this.expression) != null ? _ref2.makeReturn() : void 0;
-      if (expr && !(expr instanceof Return)) {
-        return expr.compileToFragments(o, level);
-      } else {
-        return Return.__super__.compileToFragments.call(this, o, level);
-      }
+      return expr && !(expr instanceof Return) ? expr.compileToFragments(o, level) : Return.__super__.compileToFragments.call(this, o, level);
     };
 
     Return.prototype.compileNode = function(o) {
@@ -4500,11 +4382,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
     };
 
     Value.prototype.unwrap = function() {
-      if (this.properties.length) {
-        return this;
-      } else {
-        return this.base;
-      }
+      return this.properties.length ? this : this.base;
     };
 
     Value.prototype.cacheReference = function(o) {
@@ -5022,11 +4900,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
       }
       answer.unshift(this.makeCode("{" + (props.length && '\n')));
       answer.push(this.makeCode("" + (props.length && '\n' + this.tab) + "}"));
-      if (this.front) {
-        return this.wrapInBraces(answer);
-      } else {
-        return answer;
-      }
+      return this.front ? this.wrapInBraces(answer) : answer;
     };
 
     Obj.prototype.assigns = function(name) {
@@ -5364,11 +5238,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
         return compiledName.concat(this.makeCode(": "), val);
       }
       answer = compiledName.concat(this.makeCode(" " + (this.context || '=') + " "), val);
-      if (o.level <= LEVEL_LIST) {
-        return answer;
-      } else {
-        return this.wrapInBraces(answer);
-      }
+      return o.level <= LEVEL_LIST ? answer : this.wrapInBraces(answer);
     };
 
     Assign.prototype.compilePatternMatch = function(o) {
@@ -5378,11 +5248,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
       objects = this.variable.base.objects;
       if (!(olen = objects.length)) {
         code = value.compileToFragments(o);
-        if (o.level >= LEVEL_OP) {
-          return this.wrapInBraces(code);
-        } else {
-          return code;
-        }
+        return o.level >= LEVEL_OP ? this.wrapInBraces(code) : code;
       }
       isObject = this.variable.isObject();
       if (top && olen === 1 && !((obj = objects[0]) instanceof Splat)) {
@@ -5461,11 +5327,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
         assigns.push(vvar);
       }
       fragments = this.joinFragmentArrays(assigns, ', ');
-      if (o.level < LEVEL_LIST) {
-        return fragments;
-      } else {
-        return this.wrapInBraces(fragments);
-      }
+      return o.level < LEVEL_LIST ? fragments : this.wrapInBraces(fragments);
     };
 
     Assign.prototype.compileConditional = function(o) {
@@ -5481,11 +5343,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
         }).addElse(new Assign(right, this.value, '=')).compileToFragments(o);
       } else {
         fragments = new Op(this.context.slice(0, -1), left, new Assign(right, this.value, '=')).compileToFragments(o);
-        if (o.level <= LEVEL_LIST) {
-          return fragments;
-        } else {
-          return this.wrapInBraces(fragments);
-        }
+        return o.level <= LEVEL_LIST ? fragments : this.wrapInBraces(fragments);
       }
     };
 
@@ -5515,11 +5373,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
       }
       _ref4 = this.value.cache(o, LEVEL_LIST), valDef = _ref4[0], valRef = _ref4[1];
       answer = [].concat(this.makeCode("[].splice.apply(" + name + ", [" + fromDecl + ", " + to + "].concat("), valDef, this.makeCode(")), "), valRef);
-      if (o.level > LEVEL_TOP) {
-        return this.wrapInBraces(answer);
-      } else {
-        return answer;
-      }
+      return o.level > LEVEL_TOP ? this.wrapInBraces(answer) : answer;
     };
 
     return Assign;
@@ -5665,11 +5519,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
       if (this.ctor) {
         return [this.makeCode(this.tab)].concat(__slice.call(answer));
       }
-      if (this.front || (o.level >= LEVEL_ACCESS)) {
-        return this.wrapInBraces(answer);
-      } else {
-        return answer;
-      }
+      return this.front || (o.level >= LEVEL_ACCESS) ? this.wrapInBraces(answer) : answer;
     };
 
     Code.prototype.eachParamName = function(iterator) {
@@ -6067,11 +5917,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
         return this.compileExistence(o);
       }
       answer = [].concat(this.first.compileToFragments(o, LEVEL_OP), this.makeCode(' ' + this.operator + ' '), this.second.compileToFragments(o, LEVEL_OP));
-      if (o.level <= LEVEL_OP) {
-        return answer;
-      } else {
-        return this.wrapInBraces(answer);
-      }
+      return o.level <= LEVEL_OP ? answer : this.wrapInBraces(answer);
     };
 
     Op.prototype.compileChain = function(o) {
@@ -6177,11 +6023,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
         }
         tests = tests.concat((i ? ref : sub), this.makeCode(cmp), item.compileToFragments(o, LEVEL_ACCESS));
       }
-      if (o.level < LEVEL_OP) {
-        return tests;
-      } else {
-        return this.wrapInBraces(tests);
-      }
+      return o.level < LEVEL_OP ? tests : this.wrapInBraces(tests);
     };
 
     In.prototype.compileLoopTest = function(o) {
@@ -6192,11 +6034,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
         return fragments;
       }
       fragments = sub.concat(this.makeCode(', '), fragments);
-      if (o.level < LEVEL_LIST) {
-        return fragments;
-      } else {
-        return this.wrapInBraces(fragments);
-      }
+      return o.level < LEVEL_LIST ? fragments : this.wrapInBraces(fragments);
     };
 
     In.prototype.toString = function(idt) {
@@ -6326,11 +6164,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
       }
       fragments = expr.compileToFragments(o, LEVEL_PAREN);
       bare = o.level < LEVEL_OP && (expr instanceof Op || expr instanceof Call || (expr instanceof For && expr.returns));
-      if (bare) {
-        return fragments;
-      } else {
-        return this.wrapInBraces(fragments);
-      }
+      return bare ? fragments : this.wrapInBraces(fragments);
     };
 
     return Parens;
@@ -6644,11 +6478,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
     };
 
     If.prototype.compileNode = function(o) {
-      if (this.isStatement(o)) {
-        return this.compileStatement(o);
-      } else {
-        return this.compileExpression(o);
-      }
+      return this.isStatement(o) ? this.compileStatement(o) : this.compileExpression(o);
     };
 
     If.prototype.makeReturn = function(res) {
@@ -6661,11 +6491,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
     };
 
     If.prototype.ensureBlock = function(node) {
-      if (node instanceof Block) {
-        return node;
-      } else {
-        return new Block([node]);
-      }
+      return node instanceof Block ? node : new Block([node]);
     };
 
     If.prototype.compileStatement = function(o) {
@@ -6707,11 +6533,7 @@ ace.define("ace/mode/coffee/nodes",["require","exports","module","ace/mode/coffe
       body = this.bodyNode().compileToFragments(o, LEVEL_LIST);
       alt = this.elseBodyNode() ? this.elseBodyNode().compileToFragments(o, LEVEL_LIST) : [this.makeCode('void 0')];
       fragments = cond.concat(this.makeCode(" ? "), body, this.makeCode(" : "), alt);
-      if (o.level >= LEVEL_COND) {
-        return this.wrapInBraces(fragments);
-      } else {
-        return fragments;
-      }
+      return o.level >= LEVEL_COND ? this.wrapInBraces(fragments) : fragments;
     };
 
     If.prototype.unfoldSoak = function() {
@@ -6972,14 +6794,10 @@ if ([1,2].splice(0).length != 2) {
     }()) {//IE 6/7
         var array_splice = Array.prototype.splice;
         Array.prototype.splice = function(start, deleteCount) {
-            if (!arguments.length) {
-                return [];
-            } else {
-                return array_splice.apply(this, [
+            return !arguments.length ? [] : array_splice.apply(this, [
                     start === void 0 ? 0 : start,
                     deleteCount === void 0 ? (this.length - start) : deleteCount
-                ].concat(slice.call(arguments, 2)))
-            }
+                ].concat(slice.call(arguments, 2)));
         };
     } else {//IE8
         Array.prototype.splice = function(pos, removeCount){
@@ -7316,12 +7134,9 @@ if (!Object.getOwnPropertyNames) {
 }
 if (!Object.create) {
     var createEmpty;
-    if (Object.prototype.__proto__ === null) {
-        createEmpty = function () {
+    createEmpty = Object.prototype.__proto__ === null ? function () {
             return { "__proto__": null };
-        };
-    } else {
-        createEmpty = function () {
+        } : function () {
             var empty = {};
             for (var i in empty)
                 empty[i] = null;
@@ -7334,8 +7149,7 @@ if (!Object.create) {
             empty.valueOf =
             empty.__proto__ = null;
             return empty;
-        }
-    }
+        };
 
     Object.create = function create(prototype, properties) {
         var object;
@@ -7437,11 +7251,7 @@ try {
 } catch (exception) {
     Object.freeze = (function freeze(freezeObject) {
         return function freeze(object) {
-            if (typeof object == "function") {
-                return object;
-            } else {
-                return freezeObject(object);
-            }
+            return typeof object == "function" ? object : freezeObject(object);
         };
     })(Object.freeze);
 }

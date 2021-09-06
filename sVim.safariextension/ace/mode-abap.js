@@ -171,10 +171,7 @@ oop.inherits(FoldMode, BaseFoldMode);
         else
             session.foldWidgets[row - 1] = "";
 
-        if (indent < nextIndent)
-            return "start";
-        else
-            return "";
+        return indent < nextIndent ? "start" : "";
     };
 
 }).call(FoldMode.prototype);
@@ -211,10 +208,7 @@ oop.inherits(Mode, TextMode);
             if (hereComment.test(line))
                 continue;
                 
-            if (commentLine.test(line))
-                line = line.replace(commentLine, '$1');
-            else
-                line = line.replace(indentation, '$&#');
+            line = commentLine.test(line) ? line.replace(commentLine, '$1') : line.replace(indentation, '$&#');
     
             range.end.row = range.start.row = i;
             range.end.column = line.length + 1;

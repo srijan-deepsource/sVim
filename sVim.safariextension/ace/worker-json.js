@@ -431,31 +431,19 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
     };
     this.inside = function(row, column) {
         if (this.compare(row, column) == 0) {
-            if (this.isEnd(row, column) || this.isStart(row, column)) {
-                return false;
-            } else {
-                return true;
-            }
+            return this.isEnd(row, column) || this.isStart(row, column) ? false : true;
         }
         return false;
     };
     this.insideStart = function(row, column) {
         if (this.compare(row, column) == 0) {
-            if (this.isEnd(row, column)) {
-                return false;
-            } else {
-                return true;
-            }
+            return this.isEnd(row, column) ? false : true;
         }
         return false;
     };
     this.insideEnd = function(row, column) {
         if (this.compare(row, column) == 0) {
-            if (this.isStart(row, column)) {
-                return false;
-            } else {
-                return true;
-            }
+            return this.isStart(row, column) ? false : true;
         }
         return false;
     };
@@ -481,18 +469,10 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         return 0;
     };
     this.compareStart = function(row, column) {
-        if (this.start.row == row && this.start.column == column) {
-            return -1;
-        } else {
-            return this.compare(row, column);
-        }
+        return this.start.row == row && this.start.column == column ? -1 : this.compare(row, column);
     };
     this.compareEnd = function(row, column) {
-        if (this.end.row == row && this.end.column == column) {
-            return 1;
-        } else {
-            return this.compare(row, column);
-        }
+        return this.end.row == row && this.end.column == column ? 1 : this.compare(row, column);
     };
     this.compareInside = function(row, column) {
         if (this.end.row == row && this.end.column == column) {
@@ -539,10 +519,7 @@ var Range = function(startRow, startColumn, endRow, endColumn) {
         return Range.fromPoints(this.start, this.end);
     };
     this.collapseRows = function() {
-        if (this.end.column == 0)
-            return new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0)
-        else
-            return new Range(this.start.row, 0, this.end.row, 0)
+        return this.end.column == 0 ? new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0) : new Range(this.start.row, 0, this.end.row, 0);
     };
     this.toScreenRange = function(session) {
         var screenPosStart = session.documentToScreenPosition(this.start);
@@ -638,10 +615,7 @@ var Anchor = exports.Anchor = function(doc, row, column) {
             }
         } else if (delta.action === "removeText") {
             if (start.row === row && start.column < column) {
-                if (end.column >= column)
-                    column = start.column;
-                else
-                    column = Math.max(0, column - (end.column - start.column));
+                column = end.column >= column ? start.column : Math.max(0, column - (end.column - start.column));
 
             } else if (start.row !== end.row && start.row < row) {
                 if (end.row === row)
@@ -666,14 +640,10 @@ var Anchor = exports.Anchor = function(doc, row, column) {
     };
     this.setPosition = function(row, column, noClip) {
         var pos;
-        if (noClip) {
-            pos = {
+        pos = noClip ? {
                 row: row,
                 column: column
-            };
-        } else {
-            pos = this.$clipPositionToDocument(row, column);
-        }
+            } : this.$clipPositionToDocument(row, column);
 
         if (this.row == pos.row && this.column == pos.column)
             return;
@@ -1691,14 +1661,10 @@ if ([1,2].splice(0).length != 2) {
     }()) {//IE 6/7
         var array_splice = Array.prototype.splice;
         Array.prototype.splice = function(start, deleteCount) {
-            if (!arguments.length) {
-                return [];
-            } else {
-                return array_splice.apply(this, [
+            return !arguments.length ? [] : array_splice.apply(this, [
                     start === void 0 ? 0 : start,
                     deleteCount === void 0 ? (this.length - start) : deleteCount
-                ].concat(slice.call(arguments, 2)))
-            }
+                ].concat(slice.call(arguments, 2)));
         };
     } else {//IE8
         Array.prototype.splice = function(pos, removeCount){
@@ -2035,12 +2001,9 @@ if (!Object.getOwnPropertyNames) {
 }
 if (!Object.create) {
     var createEmpty;
-    if (Object.prototype.__proto__ === null) {
-        createEmpty = function () {
+    createEmpty = Object.prototype.__proto__ === null ? function () {
             return { "__proto__": null };
-        };
-    } else {
-        createEmpty = function () {
+        } : function () {
             var empty = {};
             for (var i in empty)
                 empty[i] = null;
@@ -2053,8 +2016,7 @@ if (!Object.create) {
             empty.valueOf =
             empty.__proto__ = null;
             return empty;
-        }
-    }
+        };
 
     Object.create = function create(prototype, properties) {
         var object;
@@ -2156,11 +2118,7 @@ try {
 } catch (exception) {
     Object.freeze = (function freeze(freezeObject) {
         return function freeze(object) {
-            if (typeof object == "function") {
-                return object;
-            } else {
-                return freezeObject(object);
-            }
+            return typeof object == "function" ? object : freezeObject(object);
         };
     })(Object.freeze);
 }

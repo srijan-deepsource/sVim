@@ -156,10 +156,7 @@ var LessHighlightRules = function() {
                 regex : numRe
             }, {
                 token : function(value) {
-                    if (keywords.hasOwnProperty(value))
-                        return "keyword";
-                    else
-                        return "variable";
+                    return keywords.hasOwnProperty(value) ? "keyword" : "variable";
                 },
                 regex : "@[a-z0-9_\\-@]*\\b"
             }, {
